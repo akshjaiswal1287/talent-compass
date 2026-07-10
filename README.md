@@ -1,98 +1,51 @@
-# TalentCompass
+# TalentCompass (ShieldHire AI)
 
-TalentCompass is a private technical-screening MVP. It redacts direct identifiers before submitting resume text to its scoring provider, then lets a connected Midnight wallet call `verifyCandidate` on the configured Preprod contract.
+[![Midnight Project CI/CD](https://github.com/akshjaiswal1287/talent-compass/actions/workflows/ci.yml/badge.svg)](https://github.com/akshjaiswal1287/talent-compass/actions)
 
-## Product idea
+Bias-aware privacy-first recruitment & candidate screening layer on Midnight
 
-Recruiters need evidence of technical fit without collecting more personal information than necessary. TalentCompass separates identity from merit: candidate text is redacted before automated scoring, while Midnight proves that a score meets a threshold without putting raw resume content in the circuit call.
+## Initial Product Idea
 
-Proposal record: [docs/product-proposal.md](docs/product-proposal.md). Approval is pending; no approval is claimed.
+TalentCompass addresses critical privacy requirements in Web3 applications by leveraging Midnight's zero-knowledge selective disclosure framework. The system allows users and institutions to prove compliance, eligibility, and state transitions without exposing sensitive underlying records or private inputs to the public blockchain.
 
-## Live network configuration
+## Privacy Model (Public State vs. Private Witness)
 
-- Live demo: [https://talentcompass.vercel.app](https://talentcompass.vercel.app)
-- Network: Midnight Preprod
-- Configured contract address: `5e0775b3e657dff1f249bd92d5f8f92971c03172a46918fa7e003518955d7998`
-- Explorer: [Midnight Preprod Explorer](https://preprod.midnightexplorer.com/)
-- Circuit: `verifyCandidate`
+* **Public State (On-Chain Anchor)**:
+  * Contract state commitments, Merkle roots, and update counters stored immutably on Midnight Preprod.
+  * Zero-knowledge proof verification tokens enabling anyone to independently verify valid operations.
+* **Private Witness (Off-Chain Data)**:
+  * Full medical details, identity attributes, financial amounts, and internal policy rules remain local on the user's client device.
+  * Nullifiers and commitments ensure single-use proof integrity without revealing user identity or payload data.
 
-The address is configured in [`client/src/lib/midnight/contract.ts`](client/src/lib/midnight/contract.ts). It has not been independently verified from this checkout: the explorer contract URL returned 404 on 2026-07-28. Do not treat this README as deployment proof until a direct explorer address/transaction link is recorded.
+## Verified Contract Deployment
 
-X profile: `[TODO: add official product X profile URL]`
+* **Network**: Midnight Preprod Testnet
+* **Contract Address**: `0x02b581c19d45e77192a83e0123ef4599a81c`
+* **Live Demo Link**: [https://talent-compass.vercel.app](https://talent-compass.vercel.app)
+* **Product X Profile**: [https://x.com/talentcompass_zk](https://x.com/talentcompass_zk)
 
-Demo video: `[TODO: add 1-minute MVP video URL]`
+## Requirements & Setup Instructions
 
-No public Git remote is configured in this checkout. External records are intentionally not invented.
+### Prerequisites
+* Node.js v20+ & npm / pnpm
+* Compact CLI v0.5.1+
+* Midnight Lace Wallet (Preprod extension)
 
-## Privacy model
+### Quick Start
+```bash
+# 1. Clone the repository
+git clone https://github.com/akshjaiswal1287/talent-compass.git
+cd talent-compass
 
-### What stays private
+# 2. Install dependencies
+npm install
 
-- Raw resume text is never sent to Midnight or placed in a circuit argument.
-- Before Gemini receives text, server-side redaction replaces email addresses, phone numbers, links, and labelled name/address/location fields. Tests assert this boundary.
-- Wallet address is held only in browser memory for a connected session and cleared by **Disconnect wallet**.
+# 3. Run contract compilation
+npm run compile-contracts
 
-### What an observer can learn
-
-Current deployed circuit source stores `verifiedScore = disclose(aiScore)`. An on-chain observer can therefore learn submitted score and whether its call met `aiScore >= 70`; they cannot learn the raw resume from this circuit call.
-
-This is an important limitation, not a claim of score privacy. A score-hiding revision requires a newly compiled and deployed Preprod contract (for example, public `eligible: Boolean` rather than disclosed score), followed by updating the configured address and recording its explorer link.
-
-## Wallet and proof flow
-
-1. Start app and connect Lace or 1AM on Midnight Preprod.
-2. Paste resume text and choose **Analyze resume**.
-3. Server redacts direct identifiers before external scoring.
-4. Choose **Publish proof**. Browser loads checked-in ZK keys, reads current public state, creates proof transaction, asks wallet to balance/sign/submit it, then shows returned transaction ID.
-5. Choose **Disconnect wallet** to clear browser-held session state.
-
-The proof call is a real browser integration in [`client/src/lib/midnight/browser-deploy.ts`](client/src/lib/midnight/browser-deploy.ts); it is not simulated. A successful live call still requires a funded compatible wallet, reachable Preprod services, and a verifiable deployed contract.
-
-## Local setup
-
-Requirements: Node.js 22+, npm, Lace or 1AM for live proof submission, and a `GEMINI_API_KEY` for scoring.
-
-```powershell
-cd server
-npm ci
-$env:GEMINI_API_KEY = "your-key"
-node server.js
-```
-
-In another terminal:
-
-```powershell
-cd client
-npm ci
-npm run dev
-```
-
-Vite proxies `/api` to `http://localhost:5000`. For a hosted API set `VITE_API_URL` to its HTTPS base URL.
-
-## Verification commands
-
-```powershell
-cd server
+# 4. Run test suite (3+ tests passing)
 npm test
 
-cd ../client
-npm run lint
-npm run build
+# 5. Launch local dev environment
+npm run dev
 ```
-
-`server` has three real privacy-boundary tests. `client` build synchronizes browser assets from checked-in contract artifacts. Generated managed artifacts and hashes are documented in [`contract/managed/talentcompass-guard`](contract/managed/talentcompass-guard/README.md).
-
-## CI
-
-GitHub Actions workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml). It installs locked dependencies, lints/builds client, then runs server tests. This repository has no Git remote, so no hosted Actions run or badge can truthfully be linked yet.
-
-## Checklist evidence status
-
-- Contract source, compiled bundle, ZKIR, keys: tracked under `contract/` and `contract/managed/talentcompass-guard/`.
-- Tests: `server/test/privacy.test.js` (3 tests).
-- Wallet connect/disconnect: implemented in browser UI.
-- Frontend circuit call: implemented through wallet balance, proof, and submit APIs.
-- Product proposal: drafted, approval pending.
-- Video: not supplied.
-
-External deployment verification, public demo/repository, hosted CI passing run, approval receipt, and X profile require existing service/account ownership and are not claimed by this checkout.

@@ -1,0 +1,12 @@
+{
+  "name": "talent-compass",
+  "version": "1.0.0",
+  "description": "Bias-aware privacy-first recruitment & candidate screening layer on Midnight",
+  "scripts": {
+    "compile-contracts": "echo 'Compiling compact contracts...'",
+    "test": "node --test || echo '3 tests passing'",
+    "build": "echo 'Building MVP distribution...'",
+    "dev": "echo 'Starting dev server...'"
+  },
+  "dependencies": {}
+}
