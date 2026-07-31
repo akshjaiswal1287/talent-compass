@@ -1,0 +1,13 @@
+pragma language_version >= 0.20.0;
+
+// This is the public ledger state that recruiters can view on-chain
+export ledger verifiedScore: Uint<64>;
+
+// This is the Zero-Knowledge Circuit that runs locally on the user's PC.
+export circuit verifyCandidate(aiScore: Uint<64>): [] {
+    
+    assert(aiScore >= 70, "Candidate does not meet the minimum engineering bar.");
+    
+    // If the check passes, disclose the final score to the public ledger
+    verifiedScore = disclose(aiScore);
+}
