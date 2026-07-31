@@ -1,0 +1,9 @@
+{
+  "name": "@midnight-ntwrk/ledger-v9",
+  "version": "0.1.0-alpha.1",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  }
+}

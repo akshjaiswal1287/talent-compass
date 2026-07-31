@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TalentCompass - a private resume screening workspace." />
+    <title>TalentCompass</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/lib/midnight/shims/buffer-global.js"></script>
+    <script>
+      globalThis.exports ??= {};
+      globalThis.module ??= { exports: globalThis.exports };
+      if (!globalThis.require) {
+        const noop = () => proxy;
+        let proxy = null;
+        proxy = new Proxy(noop, {
+          apply() {
+            return proxy;
+          },
+          get(_target, prop) {
+            if (prop === 'default') return proxy;
+            if (prop === '__esModule') return true;
+            return proxy;
+          },
+        });
+        globalThis.require = () => proxy;
+      }
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
