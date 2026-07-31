@@ -1,0 +1,19 @@
+# Dependency directories
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production build outputs
+client/dist/
+server/dist/
+
+# Environment secrets
+.env
+.env.local
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Large compiled artifacts or downloaded parameters if any
+*.zip
