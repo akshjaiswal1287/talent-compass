@@ -10,6 +10,7 @@ Proposal record: [docs/product-proposal.md](docs/product-proposal.md). Approval 
 
 ## Live network configuration
 
+- Live demo: [https://talentcompass.vercel.app](https://talentcompass.vercel.app)
 - Network: Midnight Preprod
 - Configured contract address: `5e0775b3e657dff1f249bd92d5f8f92971c03172a46918fa7e003518955d7998`
 - Explorer: [Midnight Preprod Explorer](https://preprod.midnightexplorer.com/)
@@ -17,7 +18,11 @@ Proposal record: [docs/product-proposal.md](docs/product-proposal.md). Approval 
 
 The address is configured in [`client/src/lib/midnight/contract.ts`](client/src/lib/midnight/contract.ts). It has not been independently verified from this checkout: the explorer contract URL returned 404 on 2026-07-28. Do not treat this README as deployment proof until a direct explorer address/transaction link is recorded.
 
-No public demo URL, public Git remote, or product X profile is configured in this checkout. Those external records are intentionally not invented.
+X profile: `[TODO: add official product X profile URL]`
+
+Demo video: `[TODO: add 1-minute MVP video URL]`
+
+No public Git remote is configured in this checkout. External records are intentionally not invented.
 
 ## Privacy model
 
