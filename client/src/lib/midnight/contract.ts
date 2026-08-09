@@ -1,4 +1,5 @@
-export const DEPLOYED_CONTRACT_ADDRESS =
-  "5e0775b3e657dff1f249bd92d5f8f92971c03172a46918fa7e003518955d7998";
+// No unverified deployment is safe as a production fallback. /deploy writes
+// the address only after Preprod finalization and public-state verification.
+export const DEPLOYED_CONTRACT_ADDRESS = "";
 
 export const CONTRACT_NETWORK = "preprod";
