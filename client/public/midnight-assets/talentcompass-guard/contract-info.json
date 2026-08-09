@@ -24,6 +24,15 @@
     }
   ],
   "witnesses": [
+    {
+      "name": "dummyWitness",
+      "arguments": [
+      ],
+      "result type": {
+        "type-name": "Uint",
+        "maxval": 18446744073709551615
+      }
+    }
   ],
   "contracts": [
   ]

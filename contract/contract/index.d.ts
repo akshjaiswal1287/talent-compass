@@ -1,6 +1,7 @@
 import type * as __compactRuntime from '@midnight-ntwrk/compact-runtime';
 
 export type Witnesses<PS> = {
+  dummyWitness(context: __compactRuntime.WitnessContext<Ledger, PS>): [PS, bigint];
 }
 
 export type ImpureCircuits<PS> = {
@@ -23,7 +24,7 @@ export type Circuits<PS> = {
 
 export type Ledger = {
   readonly verifiedScore: bigint;
-  readonly isInitialized: boolean;
+  readonly dummyForceProof: bigint;
 }
 
 export type ContractReferenceLocations = any;
