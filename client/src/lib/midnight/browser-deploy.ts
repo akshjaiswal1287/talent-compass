@@ -271,13 +271,19 @@ export async function deployTalentCompass(session: DeploySession) {
   try {
     const finalizedData = await Promise.race([
       providers.publicDataProvider.watchForDeployTxData(contractAddress as never),
-      new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 90000)),
+      new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 300000)), // 5 mins
     ]);
     if (finalizedData) {
       transactionHash = finalizedData.txHash;
+    } else {
+      throw new Error("Finalization timed out after 5 minutes.");
     }
   } catch (error) {
     console.warn("Indexer finalization timed out or failed:", error);
+    // Add a specific error so the user knows this is the temporary hash
+    if (transactionHash.startsWith("00")) {
+      console.warn("The displayed hash is a temporary node submission ID, not the final indexer hash. Please check the explorer again in a few minutes.");
+    }
   }
 
   return { transactionId, transactionHash, contractAddress };
