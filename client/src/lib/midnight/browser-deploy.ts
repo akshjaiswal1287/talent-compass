@@ -135,10 +135,11 @@ export async function verifyCandidateOnPreprod(session: DeploySession, score: nu
     buildCompiledContract(),
   ]);
 
+  const { httpClientProofProvider } = await import("@midnight-ntwrk/midnight-js-http-client-proof-provider");
   const publicDataProvider = indexerPublicDataProvider(session.indexerUri, session.indexerWsUri);
   const publicStates = await getPublicStates(publicDataProvider, DEPLOYED_CONTRACT_ADDRESS as never);
   const zkConfigProvider = createFlatZkConfigProvider();
-  const provingProvider = await session.api.getProvingProvider(zkConfigProvider);
+  const proofProvider = httpClientProofProvider(session.proofServerUri, zkConfigProvider);
 
   const walletProvider = {
     getCoinPublicKey: () => session.coinPublicKey,
@@ -153,10 +154,7 @@ export async function verifyCandidateOnPreprod(session: DeploySession, score: nu
   const providers = {
     zkConfigProvider,
     walletProvider,
-    proofProvider: {
-      proveTx: async (unprovenTx: { prove: (provider: typeof provingProvider, costModel: unknown) => Promise<unknown> }) =>
-        unprovenTx.prove(provingProvider, CostModel.initialCostModel()),
-    },
+    proofProvider,
     publicDataProvider,
     midnightProvider: {
       submitTx: async (tx: { serialize(): Uint8Array }) => {
