@@ -33,13 +33,13 @@ function toHex(bytes: Uint8Array) {
 
 function buildCompiledContract() {
   return Promise.all([
-    import("@midnight-ntwrk/midnight-js-protocol/compact-js"),
+    import("@midnight-ntwrk/compact-js"),
     import("../../contracts/talentcompass-guard/index.js"),
   ]).then(([{ CompiledContract }, contractBundle]) => {
     const compiled = CompiledContract.make("talentcompass-guard", contractBundle.Contract as never);
     return CompiledContract.withCompiledFileAssets(
       CompiledContract.withWitnesses(compiled, {
-        dummyWitness: () => BigInt(0),
+        dummyWitness: (context) => [context.privateState, BigInt(0)] as const,
       }),
       "/midnight-assets/talentcompass-guard",
     );
@@ -193,4 +193,79 @@ export async function disconnectWallet(session: DeploySession) {
   } else if (typeof candidate.close === "function") {
     await candidate.close();
   }
+}
+
+export const ACTIVE_CONTRACT_EVENT = "midnight-active-contract";
+
+let activeContractAddress = DEPLOYED_CONTRACT_ADDRESS;
+
+export function getActiveContractAddress() {
+  return activeContractAddress;
+}
+
+export async function deployTalentCompass(session: DeploySession) {
+  await setBrowserNetworkId(session.networkId ?? desiredMidnightNetwork());
+
+  const [
+    { createUnprovenDeployTx, submitTxAsync },
+    { indexerPublicDataProvider },
+    { CostModel, Transaction },
+    compiledContract,
+  ] = await Promise.all([
+    import("@midnight-ntwrk/midnight-js-contracts"),
+    import("@midnight-ntwrk/midnight-js-indexer-public-data-provider"),
+    import("@midnight-ntwrk/ledger-v8"),
+    buildCompiledContract(),
+  ]);
+
+  const { httpClientProofProvider } = await import("@midnight-ntwrk/midnight-js-http-client-proof-provider");
+  const zkConfigProvider = createFlatZkConfigProvider();
+  const proofProvider = httpClientProofProvider(session.proofServerUri, zkConfigProvider);
+
+  const walletProvider = {
+    getCoinPublicKey: () => session.coinPublicKey,
+    getEncryptionPublicKey: () => session.encryptionPublicKey,
+    balanceTx: async (tx: { serialize(): Uint8Array }) => {
+      const balanced = await session.api.balanceUnsealedTransaction(toHex(tx.serialize()));
+      if (!balanced?.tx) throw new Error("balanceUnsealedTransaction returned no tx.");
+      return Transaction.deserialize("signature", "proof", "binding", hexToBytes(balanced.tx));
+    },
+  };
+
+  const providers = {
+    zkConfigProvider,
+    walletProvider,
+    proofProvider,
+    publicDataProvider: indexerPublicDataProvider(session.indexerUri, session.indexerWsUri),
+    midnightProvider: {
+      submitTx: async (tx: { serialize(): Uint8Array; identifiers?: () => unknown[] }) => {
+        const transactionId = tx.identifiers?.()[0];
+        const result = await session.api.submitTransaction(toHex(tx.serialize()));
+        return typeof transactionId === "string" ? transactionId : toTransactionId(result, toHex(tx.serialize()));
+      },
+    },
+  };
+
+  const { sampleSigningKey } = await import("@midnight-ntwrk/compact-runtime");
+
+  const deployTxData = await (createUnprovenDeployTx as any)(
+    { zkConfigProvider, walletProvider },
+    {
+      compiledContract,
+      args: [],
+      privateStateId: "talentCompassState",
+      initialPrivateState: {},
+      signingKey: sampleSigningKey(),
+    }
+  );
+
+  const transactionId = await submitTxAsync(providers as never, {
+    unprovenTx: deployTxData.private.unprovenTx,
+  });
+
+  const contractAddress = deployTxData.public.contractAddress;
+  activeContractAddress = contractAddress;
+  window.dispatchEvent(new CustomEvent(ACTIVE_CONTRACT_EVENT, { detail: contractAddress }));
+
+  return { transactionId, transactionHash: transactionId, contractAddress };
 }
