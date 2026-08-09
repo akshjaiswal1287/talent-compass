@@ -267,5 +267,18 @@ export async function deployTalentCompass(session: DeploySession) {
   activeContractAddress = contractAddress;
   window.dispatchEvent(new CustomEvent(ACTIVE_CONTRACT_EVENT, { detail: contractAddress }));
 
-  return { transactionId, transactionHash: transactionId, contractAddress };
+  let transactionHash = transactionId;
+  try {
+    const finalizedData = await Promise.race([
+      providers.publicDataProvider.watchForDeployTxData(contractAddress as never),
+      new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 90000)),
+    ]);
+    if (finalizedData) {
+      transactionHash = finalizedData.txHash;
+    }
+  } catch (error) {
+    console.warn("Indexer finalization timed out or failed:", error);
+  }
+
+  return { transactionId, transactionHash, contractAddress };
 }
