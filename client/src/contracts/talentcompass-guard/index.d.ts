@@ -23,6 +23,7 @@ export type Circuits<PS> = {
 
 export type Ledger = {
   readonly verifiedScore: bigint;
+  readonly isInitialized: boolean;
 }
 
 export type ContractReferenceLocations = any;

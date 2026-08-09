@@ -38,7 +38,9 @@ function buildCompiledContract() {
   ]).then(([{ CompiledContract }, contractBundle]) => {
     const compiled = CompiledContract.make("talentcompass-guard", contractBundle.Contract as never);
     return CompiledContract.withCompiledFileAssets(
-      CompiledContract.withWitnesses(compiled, {}),
+      CompiledContract.withWitnesses(compiled, {
+        dummyWitness: () => BigInt(0),
+      }),
       "/midnight-assets/talentcompass-guard",
     );
   });

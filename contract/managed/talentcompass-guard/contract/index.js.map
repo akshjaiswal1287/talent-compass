@@ -1,7 +1,7 @@
 {
   "version": 3,
   "file": "index.js",
-  "sourceRoot": "../",
+  "sourceRoot": "../../",
   "sources": ["talentcompass_guard.compact"],
   "names": [],
   "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAAA;;;;;;;;;;MAMA,AAAA,eAMC;;;;;cAN8B,SAAiB;;;;;;;;;;;;;;;;;;yCAAjB,SAAiB;;;;;;;;;iDAAjB,SAAiB;;;OAM/C;;;;GAAC;EAZF;;;;;;;;;;;;;;;;;;;;;;;;;;IAGA;;;;;;;;;yEAAsC;;;;;;;GASpC;EANF,AAAA,kBAMC,4BAN8B,SAAiB;4BAErC,SAAO;;IAGd;;;;;;;2HAAyB,SAAO;;yEAAnB;;GAChB;;;;;;;;;;;;;;;;IATD;qCAAA;;;;;;;;;;;0GAAsC;KAAA;;;;;;;;;;"
